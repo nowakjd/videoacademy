@@ -19,6 +19,7 @@ public class VideoMemory  {
     }
 
     public List<Video> getAll(){
+        load();
         return new ArrayList<Video>(videos);
     }
 
