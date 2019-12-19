@@ -32,29 +32,19 @@ public class VideoController {
         Document doc = null;
         try {
             doc = Jsoup.connect("http://5.135.218.27:8080/data/100/100").get();
+            Elements videos = doc.getElementsByClass("borderedBox");
+            videos.forEach(el-> {
+                        try {
+                            videoMemory.add(new Video(el));
+                        }
+                        catch (Exception exception) {
+
+                        }
+                    }
+            );
         } catch (IOException e) {
             e.printStackTrace();
         }
-        StringBuilder neb = new StringBuilder();
-        Elements videos = doc.getElementsByClass("borderedBox");
-        videos.forEach(el-> {
-           try {
-               videoMemory.add(new Video(el));
-           }
-           catch (Exception exception) {
-
-           }
-           }
-        );
-        for (Video video : videoMemory.getAll()) {
-            neb.append(video.getTitle());
-            neb.append("\n");
-            neb.append(video.getDescription());
-            neb.append("\n");
-            neb.append(video.getLink());
-            neb.append("\n");
-        }
-
         modelMap.addAttribute("videos", videoMemory.getAll());
         return "index";
     }
