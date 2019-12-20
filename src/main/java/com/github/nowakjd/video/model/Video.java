@@ -4,11 +4,15 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import java.io.Serializable;
 import java.util.Objects;
 
+@Entity
 public class Video implements Serializable {
     String title;
+    @Id
     String link;
     String description;
 

@@ -1,7 +1,7 @@
 package com.github.nowakjd.video.controller;
 
 import com.github.nowakjd.video.model.Video;
-import com.github.nowakjd.video.repository.VideoMemory;
+import com.github.nowakjd.video.repository.VideoService;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -21,10 +21,10 @@ import java.io.IOException;
 @Controller
 public class VideoController {
 
-    private VideoMemory videoMemory;
+    private VideoService videoService;
 
-    public VideoController(VideoMemory videoMemory) {
-        this.videoMemory = videoMemory;
+    public VideoController(VideoService videoService) {
+        this.videoService = videoService;
     }
 
     @GetMapping("/")
@@ -35,7 +35,7 @@ public class VideoController {
             Elements videos = doc.getElementsByClass("borderedBox");
             videos.forEach(el-> {
                         try {
-                            videoMemory.add(new Video(el));
+                            videoService.add(new Video(el));
                         }
                         catch (Exception exception) {
 
@@ -45,7 +45,7 @@ public class VideoController {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        modelMap.addAttribute("videos", videoMemory.getAll());
+        modelMap.addAttribute("videos", videoService.getAll());
         return "index";
     }
     @GetMapping("/edit/https://player.vimeo.com/video/{id}")
@@ -53,7 +53,7 @@ public class VideoController {
         link= "https://player.vimeo.com/video/" + link;
         Video video = new Video();
         video.setLink(link);
-        video= videoMemory.getAll().get(videoMemory.getAll().indexOf(video));
+        video= videoService.getAll().get(videoService.getAll().indexOf(video));
         model.addAttribute("video", video);
         return "update-video";
     }
@@ -64,15 +64,15 @@ public class VideoController {
 
         id= "https://player.vimeo.com/video/" + id;
         video.setLink(id);
-        videoMemory.update(video);
-        model.addAttribute("videos", videoMemory.getAll());
+        videoService.update(video);
+        model.addAttribute("videos", videoService.getAll());
         return "index";
     }
     @GetMapping("/dump")
     @ResponseBody
     public String dump(){
         StringBuilder builder = new StringBuilder();
-        for (Video video : videoMemory.getAll()) {
+        for (Video video : videoService.getAll()) {
             builder.append(video.getLink());
             builder.append("\n");
             builder.append(video.getDescription());
@@ -82,6 +82,5 @@ public class VideoController {
         }
         return builder.toString();
     }
-
 
 }

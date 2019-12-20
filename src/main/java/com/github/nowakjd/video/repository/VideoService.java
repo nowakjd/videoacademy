@@ -2,59 +2,40 @@ package com.github.nowakjd.video.repository;
 
 import com.github.nowakjd.video.model.Video;
 import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-@Repository
-public class VideoMemory  {
+@Service
+public class VideoService {
+    VideoRepository videoRepository;
     List<Video> videos = new ArrayList<>();
 
+    public VideoService(VideoRepository videoRepository) {
+        this.videoRepository = videoRepository;
+    }
+
     public void add(Video video) {
-        load();
-        if (!videos.contains(video)){
-            videos.add(video);
+        if (videoRepository.getByLink(video.getLink())==null){
+            videoRepository.save(video);
         }
-        save();
     }
 
     public List<Video> getAll(){
-        load();
-        return new ArrayList<Video>(videos);
+        List<Video> result = new ArrayList<>();
+        for (Video video : videoRepository.findAll()) {
+            result.add(0,video);
+        }
+        return result;
     }
 
     public void update(Video video) {
-       int index= videos.indexOf(video);
-       videos.remove(index);
-       videos.add(index,video);
-       save();
+       videoRepository.save(video);
     }
 
-    private void save()   {
-        FileOutputStream fos = null;
-        try {
-            fos = new FileOutputStream("t.tmp");
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        ObjectOutputStream oos = null;
-        try {
-            oos = new ObjectOutputStream(fos);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            oos.writeObject(videos);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            oos.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    private void load()  {
+
+    public void load()  {
         FileInputStream fis = null;
         try {
             fis = new FileInputStream("t.tmp");
@@ -78,6 +59,9 @@ public class VideoMemory  {
             ois.close();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+        for (Video video : videos) {
+            add(video);
         }
     }
 }
